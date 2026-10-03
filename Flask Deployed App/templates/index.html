@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% block pagetitle %}AI Disease Diagnosis Suite{% endblock pagetitle %}
+
+{% block body %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill mb-2">
+            <i class="fa-solid fa-microscope me-1"></i> AI Neural Diagnostics
+        </span>
+        <h1 class="fw-bold text-dark mb-2">Plant Leaf Disease Diagnostic Suite</h1>
+        <p class="text-muted mx-auto" style="max-width: 600px;">
+            Upload a clear photo of an infected or healthy leaf to identify the condition and discover tailored crop protection remedies.
+        </p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        <!-- Main Upload Card -->
+        <div class="col-lg-7">
+            <div class="glass-card p-4 p-md-5">
+                <form id="upload-form" action="{{ url_for('submit') }}" method="POST" enctype="multipart/form-data">
+                    
+                    <!-- Drag and Drop Dropzone -->
+                    <div id="dropzone" class="upload-dropzone mb-3">
+                        <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                        <h5 class="fw-bold text-dark mb-1">Drag and drop leaf photo here</h5>
+                        <p class="text-muted small mb-3">Supports JPG, JPEG, PNG, WEBP (Max 16MB)</p>
+                        
+                        <div class="d-flex justify-content-center gap-2 flex-wrap">
+                            <label for="file-input" class="btn btn-primary-custom btn-sm rounded-pill px-3 py-2 cursor-pointer m-0">
+                                <i class="fa-solid fa-folder-open me-1"></i> Choose From Computer
+                            </label>
+                            <button type="button" id="camera-toggle-btn" class="btn btn-outline-custom btn-sm rounded-pill px-3 py-2">
+                                <i class="fa-solid fa-camera me-1"></i> Use Device Camera
+                            </button>
+                        </div>
+                        <input type="file" id="file-input" name="image" accept="image/*" class="d-none">
+                    </div>
+
+                    <!-- Camera Stream Box (Hidden initially) -->
+                    <div id="camera-box" class="card border-0 bg-dark text-white rounded-3 p-3 mb-3 d-none">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small text-light fw-bold"><i class="fa-solid fa-circle text-danger me-1 small animate-pulse"></i> Live Camera</span>
+                            <button type="button" id="close-camera-btn" class="btn btn-sm btn-outline-light py-0 px-2">&times; Close</button>
+                        </div>
+                        <video id="camera-feed" class="w-100 rounded-2 bg-black mb-2" autoplay playsinline style="max-height: 280px; object-fit: cover;"></video>
+                        <canvas id="camera-canvas" class="d-none"></canvas>
+                        <button type="button" id="snap-photo-btn" class="btn btn-success w-100 py-2 rounded-pill fw-bold">
+                            <i class="fa-solid fa-camera-retro me-1"></i> Capture Photo
+                        </button>
+                    </div>
+
+                    <!-- Image Preview Box -->
+                    <div id="preview-box" class="card bg-light border p-3 rounded-3 mb-4 d-none">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small fw-bold text-dark"><i class="fa-solid fa-image me-1 text-success"></i> Selected Leaf Preview:</span>
+                            <button type="button" id="clear-preview-btn" class="btn btn-sm btn-link text-danger text-decoration-none p-0">Remove</button>
+                        </div>
+                        <div class="text-center">
+                            <img id="image-preview" src="#" alt="Leaf Preview" class="img-fluid rounded-3 shadow-sm" style="max-height: 260px; object-fit: contain;">
+                        </div>
+                        <div class="text-center mt-2">
+                            <span id="preview-filename" class="badge bg-secondary-subtle text-secondary small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center">
+                        <button type="submit" id="submit-btn" class="btn btn-primary-custom btn-lg w-100 py-3 rounded-pill" disabled>
+                            <i class="fa-solid fa-brain me-2"></i> Run AI Disease Diagnosis
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar Tips & Guide -->
+        <div class="col-lg-5">
+            <!-- Instructions Card -->
+            <div class="glass-card p-4 mb-4">
+                <h5 class="fw-bold text-dark mb-3">
+                    <i class="fa-solid fa-circle-check text-success me-2"></i> How to Get Best Accuracy
+                </h5>
+                <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
+                    <li class="d-flex align-items-start gap-2">
+                        <i class="fa-solid fa-check text-success mt-1"></i>
+                        <span>Focus on a <strong>single leaf</strong> showing visible symptoms (spots, mildew, blight, or discoloration).</span>
+                    </li>
+                    <li class="d-flex align-items-start gap-2">
+                        <i class="fa-solid fa-check text-success mt-1"></i>
+                        <span>Ensure <strong>bright, natural lighting</strong> without intense shadows or glare.</span>
+                    </li>
+                    <li class="d-flex align-items-start gap-2">
+                        <i class="fa-solid fa-check text-success mt-1"></i>
+                        <span>Keep the leaf centered in the frame to match the 224x224 input resolution.</span>
+                    </li>
+                    <li class="d-flex align-items-start gap-2">
+                        <i class="fa-solid fa-check text-success mt-1"></i>
+                        <span>Supports 14 common plants including Tomato, Potato, Corn, Apple, Grape, Peach, and Pepper.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Agricultural Prevention Best Practices -->
+            <div class="glass-card p-4">
+                <h5 class="fw-bold text-dark mb-3">
+                    <i class="fa-solid fa-shield-virus text-primary me-2"></i> General Plant Health Rules
+                </h5>
+                <ol class="small text-muted ps-3 mb-3 d-flex flex-column gap-2">
+                    <li><strong>Sanitation:</strong> Disinfect pruning shears between plants to stop pathogen transmission.</li>
+                    <li><strong>Watering:</strong> Water at the base/soil level rather than over foliage to discourage fungal spore germination.</li>
+                    <li><strong>Crop Rotation:</strong> Rotate Solanaceae (tomatoes, potatoes, peppers) annually to starve soilborne diseases.</li>
+                    <li><strong>Air Circulation:</strong> Prune dense branches to allow breeze and quick leaf drying.</li>
+                </ol>
+                <a href="{{ url_for('diseases_catalog') }}" class="btn btn-outline-success btn-sm w-100 rounded-pill">
+                    <i class="fa-solid fa-book-open me-1"></i> Browse Disease Encyclopedia
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Sample Tester Gallery -->
+    <div class="mt-5">
+        <div class="border-top pt-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold text-dark mb-0">
+                    <i class="fa-solid fa-flask-vial text-success me-2"></i> Try One-Click Sample Leaves
+                </h4>
+                <span class="text-muted small">Instant test without searching for files</span>
+            </div>
+
+            <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3">
+                {% for sample in samples %}
+                <div class="col">
+                    <a href="{{ url_for('sample_diagnose', filename=sample.file) }}" class="text-decoration-none">
+                        <div class="sample-card h-100 shadow-sm border">
+                            <img src="{{ url_for('static', filename='samples/' + sample.file) }}" alt="{{ sample.name }}" class="sample-thumb mb-2">
+                            <h6 class="text-dark fw-bold mb-0 small text-truncate" title="{{ sample.name }}">{{ sample.name }}</h6>
+                            <span class="badge bg-success-subtle text-success small mt-1" style="font-size: 0.7rem;">Test Now &rarr;</span>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}
+
+{% block extra_scripts %}
+<script>
+    const fileInput = document.getElementById('file-input');
+    const dropzone = document.getElementById('dropzone');
+    const previewBox = document.getElementById('preview-box');
+    const imagePreview = document.getElementById('image-preview');
+    const previewFilename = document.getElementById('preview-filename');
+    const clearPreviewBtn = document.getElementById('clear-preview-btn');
+    const submitBtn = document.getElementById('submit-btn');
+
+    const cameraToggleBtn = document.getElementById('camera-toggle-btn');
+    const cameraBox = document.getElementById('camera-box');
+    const cameraFeed = document.getElementById('camera-feed');
+    const cameraCanvas = document.getElementById('camera-canvas');
+    const snapPhotoBtn = document.getElementById('snap-photo-btn');
+    const closeCameraBtn = document.getElementById('close-camera-btn');
+    let videoStream = null;
+
+    // Handle File Input Change
+    fileInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            showPreview(this.files[0]);
+        }
+    });
+
+    // Dropzone Drag & Drop
+    ['dragenter', 'dragover'].forEach(evtName => {
+        dropzone.addEventListener(evtName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.add('dragover');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(evtName => {
+        dropzone.addEventListener(evtName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.remove('dragover');
+        });
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files && files.length > 0) {
+            fileInput.files = files;
+            showPreview(files[0]);
+        }
+    });
+
+    function showPreview(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            imagePreview.src = e.target.result;
+            previewFilename.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+            previewBox.classList.remove('d-none');
+            submitBtn.removeAttribute('disabled');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    clearPreviewBtn.addEventListener('click', () => {
+        fileInput.value = '';
+        previewBox.classList.add('d-none');
+        imagePreview.src = '#';
+        submitBtn.setAttribute('disabled', 'disabled');
+    });
+
+    // Camera Capture Functionality
+    cameraToggleBtn.addEventListener('click', async () => {
+        cameraBox.classList.remove('d-none');
+        try {
+            videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+            cameraFeed.srcObject = videoStream;
+        } catch (err) {
+            alert('Unable to access camera: ' + err.message);
+            cameraBox.classList.add('d-none');
+        }
+    });
+
+    closeCameraBtn.addEventListener('click', () => {
+        stopCamera();
+        cameraBox.classList.add('d-none');
+    });
+
+    function stopCamera() {
+        if (videoStream) {
+            videoStream.getTracks().forEach(track => track.stop());
+            videoStream = null;
+        }
+    }
+
+    snapPhotoBtn.addEventListener('click', () => {
+        if (!videoStream) return;
+        cameraCanvas.width = cameraFeed.videoWidth || 640;
+        cameraCanvas.height = cameraFeed.videoHeight || 480;
+        const ctx = cameraCanvas.getContext('2d');
+        ctx.drawImage(cameraFeed, 0, 0, cameraCanvas.width, cameraCanvas.height);
+
+        cameraCanvas.toBlob((blob) => {
+            const file = new File([blob], "camera_capture.jpg", { type: "image/jpeg" });
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+            showPreview(file);
+            stopCamera();
+            cameraBox.classList.add('d-none');
+        }, 'image/jpeg');
+    });
+</script>
+{% endblock extra_scripts %}

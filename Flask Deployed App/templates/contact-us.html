@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block pagetitle %}Contact & Support{% endblock pagetitle %}
+
+{% block body %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill mb-2">
+            <i class="fa-solid fa-users me-1"></i> Community & Support
+        </span>
+        <h1 class="fw-bold text-dark mb-2">Get in Touch with Our Team</h1>
+        <p class="text-muted mx-auto" style="max-width: 600px;">
+            Have suggestions for improving diagnostic models or inquiries regarding agricultural integrations? We are happy to assist.
+        </p>
+    </div>
+
+    <!-- Support Cards Grid -->
+    <div class="row g-4 justify-content-center mb-5">
+        <div class="col-md-6 col-lg-5">
+            <div class="glass-card p-4 h-100 text-center d-flex flex-column align-items-center">
+                <div class="crop-icon-wrap bg-success-subtle text-success mb-3 shadow-sm" style="width: 72px; height: 72px; font-size: 2rem;">
+                    🔬
+                </div>
+                <h4 class="fw-bold text-dark mb-1">Diagnostic & AI Support</h4>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill mb-3">AI & Deep Learning Services</span>
+                <p class="text-muted small mb-4">
+                    Assistance with computer vision predictions, convolutional neural network architectures, custom dataset evaluation, and REST API integrations for farm automation.
+                </p>
+                <div class="mt-auto d-flex gap-2">
+                    <a href="#message-form" class="btn btn-outline-success btn-sm rounded-pill px-4">
+                        <i class="fa-solid fa-headset me-1"></i> Technical Assistance
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-5">
+            <div class="glass-card p-4 h-100 text-center d-flex flex-column align-items-center">
+                <div class="crop-icon-wrap bg-primary-subtle text-primary mb-3 shadow-sm" style="width: 72px; height: 72px; font-size: 2rem;">
+                    🌱
+                </div>
+                <h4 class="fw-bold text-dark mb-1">Agronomy & Field Inquiries</h4>
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill mb-3">Crop Health & Disease Management</span>
+                <p class="text-muted small mb-4">
+                    Field guidelines on botanical diseases, preventative cultural practices, targeted organic/chemical supplements, and regional agricultural deployment.
+                </p>
+                <div class="mt-auto d-flex gap-2">
+                    <a href="#message-form" class="btn btn-outline-primary btn-sm rounded-pill px-4">
+                        <i class="fa-solid fa-seedling me-1"></i> Crop Inquiries
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Message Form -->
+    <div class="row justify-content-center" id="message-form">
+        <div class="col-lg-8">
+            <div class="glass-card p-4 p-md-5">
+                <h4 class="fw-bold text-dark mb-2">Send Us a Message</h4>
+                <p class="text-muted small mb-4">Got feedback on leaf classification or want a new crop added?</p>
+
+                <form onsubmit="event.preventDefault(); alert('Thank you for reaching out! Your message has been noted.'); this.reset();">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Your Name</label>
+                            <input type="text" class="form-control rounded-3" placeholder="Jane Farmer" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Email Address</label>
+                            <input type="email" class="form-control rounded-3" placeholder="jane@example.com" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-dark">Subject</label>
+                            <input type="text" class="form-control rounded-3" placeholder="Model suggestion or question" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-dark">Message</label>
+                            <textarea class="form-control rounded-3" rows="4" placeholder="How can we assist you or improve FloraScan AI?" required></textarea>
+                        </div>
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-primary-custom rounded-pill px-4 py-2">
+                                <i class="fa-solid fa-paper-plane me-1"></i> Send Feedback
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

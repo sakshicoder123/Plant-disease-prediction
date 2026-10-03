@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% block pagetitle %}Diagnosis: {{ title }}{% endblock pagetitle %}
+
+{% block body %}
+<div class="container py-4">
+    <!-- Breadcrumb & Navigation -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="{{ url_for('ai_engine_page') }}" class="btn btn-outline-secondary btn-sm rounded-pill">
+            <i class="fa-solid fa-arrow-left me-1"></i> Scan Another Leaf
+        </a>
+        <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill d-none d-md-inline-block">
+            <i class="fa-solid fa-print me-1"></i> Print / Save Report
+        </button>
+    </div>
+
+    <!-- Status Banner Header -->
+    <div class="glass-card p-4 mb-4 border-0 shadow-lg text-white" 
+         style="background: {% if is_healthy %}linear-gradient(135deg, #15803d 0%, #047857 100%){% elif is_background %}linear-gradient(135deg, #475569 0%, #334155 100%){% else %}linear-gradient(135deg, #b91c1c 0%, #991b1b 50%, #7f1d1d 100%){% endif %};">
+        <div class="row align-items-center g-3">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    {% if is_healthy %}
+                        <span class="badge bg-white text-success fw-bold px-3 py-1 rounded-pill">
+                            <i class="fa-solid fa-shield-heart me-1"></i> Healthy Foliage
+                        </span>
+                    {% elif is_background %}
+                        <span class="badge bg-white text-secondary fw-bold px-3 py-1 rounded-pill">
+                            <i class="fa-solid fa-question me-1"></i> Non-Leaf Image
+                        </span>
+                    {% else %}
+                        <span class="badge bg-white text-danger fw-bold px-3 py-1 rounded-pill">
+                            <i class="fa-solid fa-triangle-exclamation me-1"></i> Disease Detected
+                        </span>
+                    {% endif %}
+                    <span class="badge bg-black bg-opacity-25 text-white border border-white border-opacity-25 px-3 py-1 rounded-pill">
+                        Crop: {{ crop }}
+                    </span>
+                </div>
+                
+                <h1 class="display-6 fw-bold mb-1 text-white">{{ title }}</h1>
+                <p class="mb-0 text-light opacity-90 small">
+                    Diagnosed using Deep Convolutional Neural Network (39 Categories) with PyTorch engine.
+                </p>
+            </div>
+
+            <div class="col-md-4 text-md-end">
+                <div class="p-3 bg-black bg-opacity-25 rounded-3 d-inline-block text-center text-md-end w-100" style="max-width: 260px;">
+                    <span class="small text-light opacity-75 d-block mb-1">Model Confidence</span>
+                    <h2 class="display-6 fw-extrabold text-white mb-1">{{ confidence }}%</h2>
+                    <div class="confidence-bar-bg" style="background: rgba(255,255,255,0.25); height: 8px;">
+                        <div class="confidence-bar-fill" style="width: {{ confidence }}%; background: #4ade80;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="row g-4">
+        <!-- Left Column: Visuals & Differential Diagnosis -->
+        <div class="col-lg-5">
+            <!-- Leaf Comparison Card -->
+            <div class="glass-card p-4 mb-4">
+                <h5 class="fw-bold text-dark mb-3">
+                    <i class="fa-solid fa-images text-success me-2"></i> Leaf Inspection Visuals
+                </h5>
+
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="card border rounded-3 p-2 text-center h-100 bg-light">
+                            <span class="small fw-semibold text-secondary mb-2 d-block">Your Uploaded Leaf</span>
+                            <div style="height: 160px; display: flex; align-items: center; justify-content: center; overflow: hidden;" class="rounded-2 bg-white">
+                                <img src="{{ user_image }}" alt="Uploaded leaf" class="img-fluid" style="max-height: 100%; object-fit: contain;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-6">
+                        <div class="card border rounded-3 p-2 text-center h-100 bg-light">
+                            <span class="small fw-semibold text-secondary mb-2 d-block">Reference Database</span>
+                            <div style="height: 160px; display: flex; align-items: center; justify-content: center; overflow: hidden;" class="rounded-2 bg-white">
+                                {% if image_url and image_url.startswith('http') %}
+                                    <img src="{{ image_url }}" alt="Reference leaf" class="img-fluid" style="max-height: 100%; object-fit: contain;" onerror="this.src='{{ user_image }}';">
+                                {% else %}
+                                    <img src="{{ user_image }}" alt="Reference leaf" class="img-fluid" style="max-height: 100%; object-fit: contain;">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Differential Diagnosis (Top 3 Candidates) -->
+            <div class="glass-card p-4 mb-4">
+                <h5 class="fw-bold text-dark mb-2">
+                    <i class="fa-solid fa-chart-pie text-primary me-2"></i> Probability Distribution
+                </h5>
+                <p class="text-muted small mb-3">Top predictions calculated by the neural softmax layer:</p>
+
+                <div class="d-flex flex-column gap-3">
+                    {% for alt in alternates %}
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-1 small">
+                            <span class="fw-semibold text-dark text-truncate" style="max-width: 75%;">
+                                {% if loop.first %}🏆 {% endif %}{{ alt.crop }} - {{ alt.condition }}
+                            </span>
+                            <span class="fw-bold {% if loop.first %}text-success{% else %}text-muted{% endif %}">
+                                {{ alt.confidence }}%
+                            </span>
+                        </div>
+                        <div class="confidence-bar-bg" style="height: 8px;">
+                            <div class="confidence-bar-fill" style="width: {{ alt.confidence }}%; {% if not loop.first %}background: #94a3b8;{% endif %}"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Description, Management & Treatment -->
+        <div class="col-lg-7">
+            <!-- Disease Information -->
+            <div class="glass-card p-4 mb-4">
+                <h5 class="fw-bold text-dark mb-3">
+                    <i class="fa-solid fa-file-medical text-success me-2"></i>
+                    {% if is_healthy %}Growth & Maintenance Guide{% else %}Pathology & Symptom Profile{% endif %}
+                </h5>
+                <p class="text-secondary" style="line-height: 1.7;">
+                    {{ desc }}
+                </p>
+            </div>
+
+            <!-- Preventative Action Steps -->
+            <div class="glass-card p-4 mb-4">
+                <h5 class="fw-bold text-dark mb-3">
+                    <i class="fa-solid fa-shield-virus text-warning me-2"></i>
+                    {% if is_healthy %}Cultivation & Nutrition Recommendations{% else %}Recommended Control & Action Steps{% endif %}
+                </h5>
+                <div class="text-secondary" style="line-height: 1.7;">
+                    {{ prevent | safe }}
+                </div>
+            </div>
+
+            <!-- Treatment Product & Supplement Card -->
+            {% if pred != 4 %}
+            <div class="glass-card p-4 border-success-subtle bg-white">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="fa-solid fa-bottle-droplet text-success me-2"></i>
+                        {% if is_healthy %}Recommended Booster / Fertilizer{% else %}Targeted Crop Supplement / Treatment{% endif %}
+                    </h5>
+                    <span class="badge bg-success-subtle text-success small">Verified Product</span>
+                </div>
+
+                <div class="row align-items-center g-3">
+                    <div class="col-sm-4 text-center">
+                        <div class="p-2 border rounded-3 bg-light d-flex align-items-center justify-content-center" style="height: 150px;">
+                            {% if simage and simage.startswith('http') %}
+                                <img src="{{ simage }}" alt="{{ sname }}" class="img-fluid" style="max-height: 100%; object-fit: contain;" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-box-open text-muted fs-1\'></i>';">
+                            {% else %}
+                                <i class="fa-solid fa-prescription-bottle-medical text-success fs-1"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-sm-8">
+                        <h6 class="fw-bold text-dark mb-1">{{ sname }}</h6>
+                        <p class="small text-muted mb-3">
+                            Specially selected for {{ title }} management to suppress pathogen spread and restore nutrient balance.
+                        </p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            {% if buy_link and buy_link.startswith('http') %}
+                            <a href="{{ buy_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary-custom btn-sm rounded-pill px-3 py-2">
+                                <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Purchase Online
+                            </a>
+                            {% endif %}
+                            <a href="{{ url_for('market') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-2">
+                                <i class="fa-solid fa-store me-1"></i> View All Supplements
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock body %}

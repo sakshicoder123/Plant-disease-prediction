@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block pagetitle %}Plant Health AI{% endblock pagetitle %} | FloraScan AI</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5.3 & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Custom Design System -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    
+    <style>
+        h1, h2, h3, h4, h5, .brand-font {
+            font-family: 'Outfit', sans-serif;
+        }
+    </style>
+    {% block extra_head %}{% endblock extra_head %}
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                <span style="font-size: 1.6rem;">🌿</span>
+                <span class="brand-font fw-bold" style="background: linear-gradient(135deg, #15803d, #047857); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">FloraScan AI</span>
+            </a>
+            
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <i class="fa-solid fa-bars text-success fs-4"></i>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'home' %}active{% endif %}" href="{{ url_for('home') }}">
+                            <i class="fa-solid fa-house-chimney me-1 text-success opacity-75"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'ai_engine_page' %}active{% endif %}" href="{{ url_for('ai_engine_page') }}">
+                            <i class="fa-solid fa-wand-magic-sparkles me-1 text-success opacity-75"></i> AI Diagnosis
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'market' %}active{% endif %}" href="{{ url_for('market') }}">
+                            <i class="fa-solid fa-store me-1 text-success opacity-75"></i> Supplements Market
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'diseases_catalog' %}active{% endif %}" href="{{ url_for('diseases_catalog') }}">
+                            <i class="fa-solid fa-book-medical me-1 text-success opacity-75"></i> Disease Library
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'contact' %}active{% endif %}" href="{{ url_for('contact') }}">
+                            <i class="fa-solid fa-envelope me-1 text-success opacity-75"></i> Contact
+                        </a>
+                    </li>
+                    <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+                        <a href="{{ url_for('ai_engine_page') }}" class="btn btn-primary-custom btn-sm px-3 py-2 rounded-pill">
+                            <i class="fa-solid fa-camera me-1"></i> Scan Leaf
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Notifications -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm rounded-3" role="alert">
+                        <i class="fa-solid fa-circle-info me-2"></i> {{ message }}
+                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content Block -->
+    <main>
+        {% block body %}{% endblock body %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-custom">
+        <div class="container">
+            <div class="row g-4 mb-4">
+                <div class="col-lg-4">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="fs-3">🌿</span>
+                        <span class="h4 mb-0 fw-bold text-white brand-font">FloraScan AI</span>
+                    </div>
+                    <p class="small text-secondary mb-3">
+                        Deep learning convolutional neural network designed to identify 39 conditions across 14 fruit and vegetable crops with high accuracy.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-dark border border-secondary text-secondary">PyTorch 2.x</span>
+                        <span class="badge bg-dark border border-secondary text-secondary">CNN Architecture</span>
+                        <span class="badge bg-dark border border-secondary text-secondary">PlantVillage Dataset</span>
+                    </div>
+                </div>
+                
+                <div class="col-6 col-lg-2 offset-lg-1">
+                    <h6 class="text-white fw-bold mb-3">Quick Navigation</h6>
+                    <ul class="list-unstyled small d-flex flex-column gap-2 mb-0">
+                        <li><a href="{{ url_for('home') }}">Home Overview</a></li>
+                        <li><a href="{{ url_for('ai_engine_page') }}">AI Diagnosis Engine</a></li>
+                        <li><a href="{{ url_for('market') }}">Supplements Market</a></li>
+                        <li><a href="{{ url_for('diseases_catalog') }}">Disease Encyclopedia</a></li>
+                        <li><a href="{{ url_for('contact') }}">About & Team</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-6 col-lg-2">
+                    <h6 class="text-white fw-bold mb-3">Detectable Crops</h6>
+                    <ul class="list-unstyled small d-flex flex-column gap-2 mb-0 text-secondary">
+                        <li>🍎 Apple & 🍇 Grape</li>
+                        <li>🌽 Corn & 🥔 Potato</li>
+                        <li>🍅 Tomato & 🫑 Pepper</li>
+                        <li>🍑 Peach & 🍒 Cherry</li>
+                        <li>🍓 Strawberry & 🫐 Blueberry</li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3">
+                    <h6 class="text-white fw-bold mb-3">API & Developer</h6>
+                    <p class="small text-secondary mb-2">
+                        Integrate directly with our REST endpoint <code>POST /api/predict</code> for mobile apps and farm automation.
+                    </p>
+                    <a href="{{ url_for('ai_engine_page') }}" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                        <i class="fa-solid fa-code me-1"></i> Try Diagnostic Suite
+                    </a>
+                </div>
+            </div>
+            
+            <hr class="border-secondary opacity-25">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small text-secondary pt-2">
+                <p class="mb-0">&copy; 2026 FloraScan AI • Intelligent Plant Disease Detection System</p>
+                <div class="d-flex gap-3 mt-2 mt-md-0">
+                    <a href="{{ url_for('contact') }}" class="text-secondary text-decoration-none"><i class="fa-solid fa-headset me-1"></i> Help & Support</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_scripts %}{% endblock extra_scripts %}
+</body>
+</html>

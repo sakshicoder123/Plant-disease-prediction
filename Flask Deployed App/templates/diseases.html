@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block pagetitle %}Plant Disease Encyclopedia & Reference Library{% endblock pagetitle %}
+
+{% block body %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill mb-2">
+            <i class="fa-solid fa-book-medical me-1"></i> Agricultural Knowledge Base
+        </span>
+        <h1 class="fw-bold text-dark mb-2">Plant Disease Encyclopedia</h1>
+        <p class="text-muted mx-auto" style="max-width: 600px;">
+            Comprehensive reference database of all 39 conditions detectable by FloraScan AI across 14 crops.
+        </p>
+    </div>
+
+    <!-- Quick Crop Navigation Pills -->
+    <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+        <a href="#all" class="btn btn-outline-success btn-sm rounded-pill active" onclick="filterCrop('all', this); return false;">All Crops</a>
+        {% for crop in crops_grouped.keys() %}
+        <a href="#{{ crop }}" class="btn btn-outline-secondary btn-sm rounded-pill" onclick="filterCrop('{{ crop }}', this); return false;">{{ crop }}</a>
+        {% endfor %}
+    </div>
+
+    <!-- Diseases List -->
+    <div class="row g-4" id="diseases-container">
+        {% for item in catalog %}
+        <div class="col-md-6 col-lg-4 disease-item" data-crop="{{ item.crop }}">
+            <div class="glass-card h-100 p-4 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-dark text-white rounded-pill small">{{ item.crop }}</span>
+                    {% if item.is_healthy %}
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill small">Healthy Leaf</span>
+                    {% else %}
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill small">Pathogen</span>
+                    {% endif %}
+                </div>
+
+                <h5 class="fw-bold text-dark mb-2">{{ item.name }}</h5>
+                <p class="text-muted small flex-grow-1" style="line-height: 1.6; max-height: 96px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;">
+                    {{ item.description }}
+                </p>
+
+                <div class="pt-3 border-top mt-2">
+                    <a href="{{ url_for('ai_engine_page') }}" class="btn btn-outline-success btn-sm rounded-pill w-100">
+                        <i class="fa-solid fa-microscope me-1"></i> Scan Leaf For This
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock body %}
+
+{% block extra_scripts %}
+<script>
+    function filterCrop(crop, btnElement) {
+        document.querySelectorAll('.btn-outline-success, .btn-outline-secondary').forEach(b => {
+            b.classList.remove('btn-outline-success', 'active');
+            b.classList.add('btn-outline-secondary');
+        });
+        btnElement.classList.remove('btn-outline-secondary');
+        btnElement.classList.add('btn-outline-success', 'active');
+
+        const items = document.querySelectorAll('.disease-item');
+        items.forEach(item => {
+            if (crop === 'all' || item.getAttribute('data-crop') === crop) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+</script>
+{% endblock extra_scripts %}

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block pagetitle %}Agricultural Supplements & Treatments Market{% endblock pagetitle %}
+
+{% block body %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill mb-2">
+            <i class="fa-solid fa-cart-shopping me-1"></i> Agricultural Marketplace
+        </span>
+        <h1 class="fw-bold text-dark mb-2">Plant Supplements & Fertilizer Store</h1>
+        <p class="text-muted mx-auto" style="max-width: 600px;">
+            Targeted fungicides, biopesticides, and organic plant foods matched to every plant condition in our diagnostic library.
+        </p>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="glass-card p-3 p-md-4 mb-4">
+        <form action="{{ url_for('market') }}" method="GET" class="row g-3 align-items-center">
+            <div class="col-md-6 col-lg-7">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input type="text" name="q" value="{{ query }}" class="form-control border-start-0 shadow-none ps-0" placeholder="Search by crop (e.g., Tomato, Corn) or remedy...">
+                </div>
+            </div>
+
+            <div class="col-md-4 col-lg-3">
+                <select name="cat" class="form-select shadow-none" onchange="this.form.submit()">
+                    <option value="all" {% if category == 'all' %}selected{% endif %}>All Products ({{ total_count }})</option>
+                    <option value="treatment" {% if category == 'treatment' %}selected{% endif %}>Disease Treatments / Fungicides</option>
+                    <option value="healthy" {% if category == 'healthy' %}selected{% endif %}>Healthy Growth Boosters</option>
+                </select>
+            </div>
+
+            <div class="col-md-2 col-lg-2">
+                <button type="submit" class="btn btn-primary-custom w-100 rounded-pill py-2">
+                    Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for item in items %}
+        <div class="col">
+            <div class="glass-card h-100 d-flex flex-column p-3">
+                <!-- Type Badge -->
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    {% if item.is_healthy %}
+                        <span class="badge bg-success-subtle text-success small border border-success-subtle rounded-pill">
+                            <i class="fa-solid fa-leaf me-1"></i> Fertilizer
+                        </span>
+                    {% else %}
+                        <span class="badge bg-danger-subtle text-danger small border border-danger-subtle rounded-pill">
+                            <i class="fa-solid fa-shield-virus me-1"></i> Treatment
+                        </span>
+                    {% endif %}
+                    <span class="text-muted small" style="font-size: 0.72rem;">#{{ item.index }}</span>
+                </div>
+
+                <!-- Product Image -->
+                <div class="rounded-3 bg-light p-2 mb-3 text-center d-flex align-items-center justify-content-center" style="height: 180px; overflow: hidden;">
+                    {% if item.image and item.image.startswith('http') %}
+                        <img src="{{ item.image }}" alt="{{ item.name }}" class="img-fluid" style="max-height: 100%; object-fit: contain;" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-prescription-bottle-medical text-muted fs-1\'></i>';">
+                    {% else %}
+                        <i class="fa-solid fa-prescription-bottle-medical text-success fs-1"></i>
+                    {% endif %}
+                </div>
+
+                <!-- Product Information -->
+                <div class="flex-grow-1">
+                    <span class="text-muted small d-block mb-1 text-truncate" title="Target: {{ item.disease }}">
+                        Target: <strong>{{ item.disease }}</strong>
+                    </span>
+                    <h6 class="fw-bold text-dark mb-2" style="font-size: 0.95rem; min-height: 42px;">
+                        {{ item.name }}
+                    </h6>
+                </div>
+
+                <!-- Buy Action Button -->
+                <div class="mt-3 pt-2 border-top">
+                    {% if item.buy and item.buy.startswith('http') %}
+                        <a href="{{ item.buy }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-success btn-sm w-100 rounded-pill py-2">
+                            <i class="fa-solid fa-cart-arrow-down me-1"></i> Buy Product
+                        </a>
+                    {% else %}
+                        <button class="btn btn-light btn-sm w-100 rounded-pill py-2 text-muted" disabled>
+                            Available In-Store
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center py-5">
+            <i class="fa-solid fa-box-open text-muted fs-1 mb-3"></i>
+            <h4 class="text-muted">No products found matching your search.</h4>
+            <a href="{{ url_for('market') }}" class="btn btn-primary-custom btn-sm rounded-pill mt-2">Clear Filter</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock body %}

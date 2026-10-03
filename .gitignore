@@ -1,0 +1,23 @@
+# Model Weights (>100MB exceeds GitHub push limits; auto-downloaded by download_model.py)
+*.pt
+
+# Python Bytecode and Caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Uploads
+Flask Deployed App/static/uploads/*
+!Flask Deployed App/static/uploads/.gitkeep
+
+# Virtual Environments
+.venv/
+venv/
+env/
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
